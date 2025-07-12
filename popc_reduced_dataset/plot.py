@@ -57,5 +57,5 @@ ax2.legend(loc='lower left')
 ax2.set_title('Superavg')
 
 plt.tight_layout()
-plt.savefig(output_path / "iq.pdf")
+plt.savefig(output_path / "iq_robust.pdf")
 plt.close(fig)
