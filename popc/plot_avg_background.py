@@ -31,15 +31,19 @@ for variant in VARIANTS:
     images[variant] = fabio.open(str(file_path)).data
 
 # Plotting
-def plot_avg_background(ax: Axes, image: np.ndarray, title: str) -> None:
+def plot_avg_background(image: np.ndarray, title: str, output_file: str) -> None:
+    fig, ax = plt.subplots(figsize=(4, 4))
     ax.imshow(image, cmap=CMAP, vmin=VMIN, vmax=VMAX)
     ax.set_title(title)
     ax.axis("off")
+    plt.tight_layout()
+    plt.savefig(output_file)
+    plt.close()
 
-fig, axes = plt.subplots(1, 2, figsize=(6, 4))
+# Create subfolder for individual plots
+background_output_path = output_path / "avg_background"
+background_output_path.mkdir(parents=True, exist_ok=True)
+
 for i in range(2):
-    plot_avg_background(axes[i], images[VARIANTS[i]], TITLES[i])
-
-plt.tight_layout()
-plt.savefig(output_path / "popc_avg_background.pdf")
-plt.close() 
+    filename = f"popc_avg_background_{VARIANTS[i]}.pdf"
+    plot_avg_background(images[VARIANTS[i]], TITLES[i], background_output_path / filename) 

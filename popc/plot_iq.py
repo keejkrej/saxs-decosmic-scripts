@@ -66,6 +66,10 @@ empty_iq_result_avg = load_iq_result_avg("empty")
 final_iq_result_avg = load_iq_result_avg("final")
 final_iq_fit = load_iq_fit("final")
 
+# Create subfolder for individual plots
+iq_output_path = output_path / "iq"
+iq_output_path.mkdir(parents=True, exist_ok=True)
+
 # POPC solution
 fig, ax = plt.subplots(figsize=(6, 4))
 plot_iq_scatter(ax, popc_iq_result_avg)
@@ -75,7 +79,7 @@ ax.set_title('POPC solution')
 ax.legend(loc='upper right')
 
 plt.tight_layout()
-plt.savefig(output_path / "iq_popc_solution.pdf")
+plt.savefig(iq_output_path / "iq_popc_solution.pdf")
 plt.close(fig)
 
 # Pure water
@@ -87,7 +91,7 @@ ax.set_title('Pure water')
 ax.legend(loc='upper right')
 
 plt.tight_layout()
-plt.savefig(output_path / "iq_pure_water.pdf")
+plt.savefig(iq_output_path / "iq_pure_water.pdf")
 plt.close(fig)
 
 # Empty cell
@@ -102,7 +106,7 @@ ax.axhline(y=1.4e-3, color='black', linestyle='--', label='1.4e-3')
 ax.legend(loc='upper right', ncol=2)
 
 plt.tight_layout()
-plt.savefig(output_path / "iq_empty_cell.pdf")
+plt.savefig(iq_output_path / "iq_empty_cell.pdf")
 plt.close(fig)
 
 # POPC subtracted
@@ -117,5 +121,5 @@ ax.axhline(y=1.0e-5, color='black', linestyle='-.', label='1.0e-5')
 ax.legend(loc='upper right', ncol=2)
 
 plt.tight_layout()
-plt.savefig(output_path / "iq_popc_subtracted.pdf")
+plt.savefig(iq_output_path / "iq_popc_subtracted.pdf")
 plt.close(fig)

@@ -31,8 +31,9 @@ def load_hist_result(name: str, variant: str) -> pd.DataFrame:
     return pd.read_csv(input_path / f"{name}_{variant}.csv")
 
 # Plotting
-def plot_hist(ax: Axes, hist_data: pd.DataFrame, color: str) -> None:
-    """Plot histogram as a bar plot on the given axis."""
+def plot_hist(hist_data: pd.DataFrame, color: str, title: str, output_file: str) -> None:
+    """Plot histogram as a bar plot and save to file."""
+    fig, ax = plt.subplots(figsize=(6, 4))
     if len(hist_data['bins']) > 1:
         width = hist_data['bins'][1] - hist_data['bins'][0]
     else:
@@ -44,18 +45,19 @@ def plot_hist(ax: Axes, hist_data: pd.DataFrame, color: str) -> None:
     ax.set_xlabel('Intensity [a.u.]')
     ax.set_ylabel('Count')
     ax.set_yscale('log')
+    ax.set_title(title)
+    ax.set_xlim(XMIN, XMAX)
+    plt.tight_layout()
+    plt.savefig(output_file)
+    plt.close()
 
 # Main script
 popc_hist_results = {variant: load_hist_result("popc", variant) for variant in VARIANTS}
 
-fig, axes = plt.subplots(2, 3, figsize=(10, 6))
-axes = axes.flatten()
+# Create subfolder for individual plots
+hist_output_path = output_path / "hist"
+hist_output_path.mkdir(parents=True, exist_ok=True)
 
 for i in range(6):
-    plot_hist(axes[i], popc_hist_results[VARIANTS[i]], COLORS[i])
-    axes[i].set_title(TITLES[i])
-    axes[i].set_xlim(XMIN, XMAX)
-
-plt.tight_layout()
-plt.savefig(output_path / "hist.pdf")
-plt.close(fig)
+    filename = f"hist_{VARIANTS[i]}.pdf"
+    plot_hist(popc_hist_results[VARIANTS[i]], COLORS[i], TITLES[i], hist_output_path / filename)

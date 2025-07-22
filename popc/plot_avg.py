@@ -31,16 +31,20 @@ for variant in VARIANTS:
     file_path = input_path / MEASUREMENT / "processed" / f"{MEASUREMENT}_{variant}.tif"
     images[variant] = fabio.open(str(file_path)).data
 
-def plot_avg(ax: Axes, image: np.ndarray, title: str) -> None:
+def plot_avg(image: np.ndarray, title: str, output_file: str) -> None:
+    fig, ax = plt.subplots(figsize=(4, 4))
     ax.imshow(image, cmap=CMAP, vmin=VMIN, vmax=VMAX)
     ax.set_title(title)
     ax.axis("off")
+    plt.tight_layout()
+    plt.savefig(output_file)
+    plt.close()
+
+# Create subfolder for individual plots
+avg_output_path = output_path / "avg"
+avg_output_path.mkdir(parents=True, exist_ok=True)
 
 # Plotting
-fig, axes = plt.subplots(1, 3, figsize=(10, 4))
 for i in range(3):
-    plot_avg(axes[i], images[VARIANTS[i]], TITLES[i])
-
-plt.tight_layout()
-plt.savefig(output_path / "popc_avg.pdf")
-plt.close()
+    filename = f"popc_avg_{VARIANTS[i]}.pdf"
+    plot_avg(images[VARIANTS[i]], TITLES[i], avg_output_path / filename)
