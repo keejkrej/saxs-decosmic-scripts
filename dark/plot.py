@@ -25,38 +25,44 @@ img_streak = tifffile.imread(processed_path / "streak.tif")
 mask_donut = tifffile.imread(processed_path / "donut_mask.tif").astype(bool)
 mask_streak = tifffile.imread(processed_path / "streak_mask.tif").astype(bool)
 
-# Create subplots with a larger first subplot
-fig = plt.figure(figsize=FIG_SIZE)
-gs = fig.add_gridspec(2, 3, width_ratios=[2, 1, 1], height_ratios=[1, 1])
+# Create individual plots for each image/mask
 
-# Larger subplot for dark average (combines axes[0] and axes[3])
-ax0 = fig.add_subplot(gs[0:2, 0])
-ax0.imshow(img_avg, cmap=CMAP, vmin=V_MIN[0], vmax=V_MAX[0])
-ax0.set_title("a) Dark Average")
-ax0.axis('off')
-
-# Other subplots
-ax1 = fig.add_subplot(gs[0, 1])
-ax1.imshow(img_donut, cmap=CMAP, vmin=V_MIN[1], vmax=V_MAX[1])
-ax1.set_title("b) Donut")
-ax1.axis('off')
-
-ax2 = fig.add_subplot(gs[0, 2])
-ax2.imshow(img_streak, cmap=CMAP, vmin=V_MIN[2], vmax=V_MAX[2])
-ax2.set_title("c) Streak")
-ax2.axis('off')
-
-ax4 = fig.add_subplot(gs[1, 1])
-ax4.imshow(mask_donut, cmap=CMAP, vmin=V_MIN[3], vmax=V_MAX[3])
-ax4.set_title("d) Donut Mask")
-ax4.axis('off')
-
-ax5 = fig.add_subplot(gs[1, 2])
-ax5.imshow(mask_streak, cmap=CMAP, vmin=V_MIN[4], vmax=V_MAX[4])
-ax5.set_title("e) Streak Mask")
-ax5.axis('off')
-
-# Adjust layout and save
+# Dark Average plot
+fig, ax = plt.subplots(figsize=(8, 8))
+ax.imshow(img_avg, cmap=CMAP, vmin=V_MIN[0], vmax=V_MAX[0])
+ax.axis('off')
 fig.tight_layout()
-fig.savefig(save_path / "dark.pdf")
+fig.savefig(save_path / "dark_average.pdf")
+plt.close(fig)
+
+# Donut plot
+fig, ax = plt.subplots(figsize=(4, 4))
+ax.imshow(img_donut, cmap=CMAP, vmin=V_MIN[1], vmax=V_MAX[1])
+ax.axis('off')
+fig.tight_layout()
+fig.savefig(save_path / "donut.pdf")
+plt.close(fig)
+
+# Streak plot
+fig, ax = plt.subplots(figsize=(4, 4))
+ax.imshow(img_streak, cmap=CMAP, vmin=V_MIN[2], vmax=V_MAX[2])
+ax.axis('off')
+fig.tight_layout()
+fig.savefig(save_path / "streak.pdf")
+plt.close(fig)
+
+# Donut Mask plot
+fig, ax = plt.subplots(figsize=(4, 4))
+ax.imshow(mask_donut, cmap=CMAP, vmin=V_MIN[3], vmax=V_MAX[3])
+ax.axis('off')
+fig.tight_layout()
+fig.savefig(save_path / "donut_mask.pdf")
+plt.close(fig)
+
+# Streak Mask plot
+fig, ax = plt.subplots(figsize=(4, 4))
+ax.imshow(mask_streak, cmap=CMAP, vmin=V_MIN[4], vmax=V_MAX[4])
+ax.axis('off')
+fig.tight_layout()
+fig.savefig(save_path / "streak_mask.pdf")
 plt.close(fig) 

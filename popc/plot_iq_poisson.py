@@ -11,11 +11,6 @@ INPUT_DIR = "iq"
 OUTPUT_DIR = "plot"
 VARIANTS = ['direct', 'half_clean', 'clean']
 COLORS = ['red', 'blue']
-TITLES = [
-    '(a) POPC Direct',
-    '(b) POPC Half Clean',
-    '(c) POPC Clean'
-]
 
 input_path = Path(INPUT_DIR).resolve()
 output_path = Path(OUTPUT_DIR).resolve()
@@ -27,7 +22,7 @@ def load_iq_result(name: str, prefix: str) -> dict[str, pd.DataFrame]:
     return {variant: pd.read_csv(input_path / f"{name}_{prefix}_{variant}.csv") for variant in VARIANTS}
 
 # Plotting
-def plot_iq(iq_result_1: pd.DataFrame, iq_result_2: pd.DataFrame, title: str, output_file: str, xlim: tuple = None, ylim: tuple = None) -> None:
+def plot_iq(iq_result_1: pd.DataFrame, iq_result_2: pd.DataFrame, output_file: str, xlim: tuple[float, float], ylim: tuple[float, float]) -> None:
     """Plot two I(q) curves and save to file."""
     fig, ax = plt.subplots(figsize=(4, 4))
     ax.plot(iq_result_1['q'], iq_result_1['intensity'], label="mean", color=COLORS[0])
@@ -35,12 +30,9 @@ def plot_iq(iq_result_1: pd.DataFrame, iq_result_2: pd.DataFrame, title: str, ou
     ax.set_xlabel('q [A$^{-1}$]')
     ax.set_ylabel('Intensity [a.u.]')
     ax.set_yscale('log')
-    ax.set_title(title)
     ax.legend(loc='upper right')
-    if xlim:
-        ax.set_xlim(*xlim)
-    if ylim:
-        ax.set_ylim(*ylim)
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
     plt.tight_layout()
     plt.savefig(output_file)
     plt.close()
@@ -62,6 +54,6 @@ xlims = [(0.05, 0.5), (0.05, 0.5), (0.05, 0.5)]
 ylims = [(3e-3, 5e-2), (4e-3, 1.2e-2), (3e-3, 1e-2)]
 
 for i in range(3):
-    filename = f"popc_iq_poisson_{VARIANTS[i]}.pdf"
+    filename = f"iq_popc_poisson_{VARIANTS[i]}.pdf"
     plot_iq(popc_iq_result_avg[VARIANTS[i]], popc_iq_result_var[VARIANTS[i]], 
-            TITLES[i], iq_poisson_output_path / filename, xlims[i], ylims[i])
+            iq_poisson_output_path / filename, xlims[i], ylims[i])

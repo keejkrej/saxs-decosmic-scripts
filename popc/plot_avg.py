@@ -1,7 +1,6 @@
 from pathlib import Path
 import fabio
 import matplotlib.pyplot as plt
-from matplotlib.axes import Axes
 import numpy as np
 from plot_style import apply_style
 
@@ -12,11 +11,6 @@ INPUT_DIR = "."
 OUTPUT_DIR = "plot"
 MEASUREMENT = "popc"
 VARIANTS = ["avg_direct", "avg_half_clean", "avg_clean"]
-TITLES = [
-    '(a) POPC Direct',
-    '(b) POPC Half Clean',
-    '(c) POPC Clean'
-]
 VMIN = 0
 VMAX = 2e-2
 CMAP = "hot"
@@ -31,10 +25,9 @@ for variant in VARIANTS:
     file_path = input_path / MEASUREMENT / "processed" / f"{MEASUREMENT}_{variant}.tif"
     images[variant] = fabio.open(str(file_path)).data
 
-def plot_avg(image: np.ndarray, title: str, output_file: str) -> None:
+def plot_avg(image: np.ndarray, output_file: str) -> None:
     fig, ax = plt.subplots(figsize=(4, 4))
     ax.imshow(image, cmap=CMAP, vmin=VMIN, vmax=VMAX)
-    ax.set_title(title)
     ax.axis("off")
     plt.tight_layout()
     plt.savefig(output_file)
@@ -46,5 +39,5 @@ avg_output_path.mkdir(parents=True, exist_ok=True)
 
 # Plotting
 for i in range(3):
-    filename = f"popc_avg_{VARIANTS[i]}.pdf"
-    plot_avg(images[VARIANTS[i]], TITLES[i], avg_output_path / filename)
+    filename = f"popc_{VARIANTS[i]}.pdf"
+    plot_avg(images[VARIANTS[i]], avg_output_path / filename)

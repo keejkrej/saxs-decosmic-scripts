@@ -11,7 +11,6 @@ apply_style()
 INPUT_DIR = "iq"
 OUTPUT_DIR = "plot"
 VARIANTS = ['direct', 'half_clean', 'clean']
-SCALES = [1e4, 1e2, 1.]
 MARKERS = ['o', 's', '^']
 COLORS = ['red', 'blue', 'black']
 
@@ -24,26 +23,11 @@ def load_iq_result_avg(name: str) -> dict[str, pd.DataFrame]:
     """Load I(q) average CSVs for a given measurement."""
     return {variant: pd.read_csv(input_path / f"{name}_avg_{variant}.csv") for variant in VARIANTS}
 
-def load_iq_fit(name: str) -> pd.DataFrame:
+def load_iq_fit() -> pd.DataFrame:
     """Load I(q) fit CSV for subtracted clean variant."""
-    return np.loadtxt(input_path / f"fit.txt", skiprows=1)
+    return np.loadtxt(input_path / "fit.txt", skiprows=1)
 
 # Plotting
-def plot_iq_errbar(ax: Axes, iq_result: dict[str, pd.DataFrame], scale: list[float] | None = None) -> None:
-    """Plot I(q) with error bars for all variants on the given axis."""
-    if scale is None:
-        scale = [1.] * len(VARIANTS)
-    for i, (label, marker, color) in enumerate(zip(VARIANTS, MARKERS, COLORS)):
-        df = iq_result[label]
-        yerr = df['sigma'] if 'sigma' in df else None
-        ax.errorbar(
-            df['q'], df['intensity'] * scale[i], yerr=yerr * scale[i] if yerr is not None else None,
-            fmt=marker, label=label.replace('_', ' '), alpha=0.8, markersize=6, capsize=2, color=color,
-            uplims=False, lolims=True, linestyle='none', markerfacecolor='none'
-        )
-    ax.set_xlabel('q [A$^{-1}$]')
-    ax.set_ylabel('Intensity [a.u.]')
-    ax.set_yscale('log')
 
 def plot_iq_scatter(ax: Axes, iq_result: dict[str, pd.DataFrame], scale: list[float] | None = None) -> None:
     """Scatter plot I(q) for all variants on the given axis (no error bars)."""
@@ -64,7 +48,7 @@ popc_iq_result_avg = load_iq_result_avg("popc")
 water_iq_result_avg = load_iq_result_avg("water")
 empty_iq_result_avg = load_iq_result_avg("empty")
 final_iq_result_avg = load_iq_result_avg("final")
-final_iq_fit = load_iq_fit("final")
+final_iq_fit = load_iq_fit()
 
 # Create subfolder for individual plots
 iq_output_path = output_path / "iq"
@@ -87,7 +71,6 @@ fig, ax = plt.subplots(figsize=(6, 4))
 plot_iq_scatter(ax, water_iq_result_avg)
 ax.set_xlim(0.05, 0.5)
 ax.set_ylim(3.0e-3, 1.2e-2)
-ax.set_title('Pure water')
 ax.legend(loc='upper right')
 
 plt.tight_layout()
@@ -99,7 +82,6 @@ fig, ax = plt.subplots(figsize=(6, 4))
 plot_iq_scatter(ax, empty_iq_result_avg)
 ax.set_xlim(0.05, 0.5)
 ax.set_ylim(1e-3, 1e-2)
-ax.set_title('Empty cell')
 ax.axhline(y=3.0e-3, color='red', linestyle='--', label='3.0e-3')
 ax.axhline(y=2.5e-3, color='blue', linestyle='--', label='2.5e-3')
 ax.axhline(y=1.4e-3, color='black', linestyle='--', label='1.4e-3')
@@ -109,17 +91,48 @@ plt.tight_layout()
 plt.savefig(iq_output_path / "iq_empty_cell.pdf")
 plt.close(fig)
 
-# POPC subtracted
+# POPC subtracted - individual plots for each variant
+for variant in VARIANTS:
+    fig, ax = plt.subplots(figsize=(6, 4))
+    df = final_iq_result_avg[variant]
+    yerr = df['sigma'] if 'sigma' in df else None
+    ax.errorbar(
+        df['q'], df['intensity'], yerr=yerr,
+        fmt='o', alpha=0.8, markersize=6, capsize=2, color='black',
+        uplims=False, lolims=True, linestyle='none', markerfacecolor='none',
+        label='experiment'
+    )
+    if variant == 'clean':
+        ax.axhline(y=1.0e-4, color='blue', linestyle='--', label='1.0e-4')
+        ax.axhline(y=1.0e-5, color='blue', linestyle='-.', label='1.0e-5')
+    ax.legend(loc='upper right')
+    ax.set_xlim(0.05, 0.5)
+    ax.set_ylim(1e-6, 1e-2)
+    ax.set_xlabel('q [A$^{-1}$]')
+    ax.set_ylabel('Intensity [a.u.]')
+    ax.set_yscale('log')
+    
+    plt.tight_layout()
+    plt.savefig(iq_output_path / f"iq_popc_subtracted_{variant}.pdf")
+    plt.close(fig)
+
 fig, ax = plt.subplots(figsize=(6, 4))
-plot_iq_errbar(ax, final_iq_result_avg, SCALES)
-ax.plot(final_iq_fit[:, 0], final_iq_fit[:, 1], color='black', label='Fit')
+df = final_iq_result_avg['clean']
+yerr = df['sigma'] if 'sigma' in df else None
+ax.errorbar(
+    df['q'], df['intensity'], yerr=yerr,
+    fmt='o', alpha=0.8, markersize=6, capsize=2, color='black',
+    uplims=False, lolims=True, linestyle='none', markerfacecolor='none',
+    label='experiment'
+)
+ax.plot(final_iq_fit[:, 0], final_iq_fit[:, 1], color='red', label='Fit')
+ax.legend(loc='upper right')
 ax.set_xlim(0.05, 0.5)
-ax.set_ylim(1e-7, 1e3)
-ax.set_title('POPC subtracted')
-ax.axhline(y=1.0e-4, color='black', linestyle='--', label='1.0e-4')
-ax.axhline(y=1.0e-5, color='black', linestyle='-.', label='1.0e-5')
-ax.legend(loc='upper right', ncol=2)
+ax.set_ylim(1e-6, 1e-2)
+ax.set_xlabel('q [A$^{-1}$]')
+ax.set_ylabel('Intensity [a.u.]')
+ax.set_yscale('log')
 
 plt.tight_layout()
-plt.savefig(iq_output_path / "iq_popc_subtracted.pdf")
+plt.savefig(iq_output_path / "iq_popc_subtracted_clean_fit.pdf")
 plt.close(fig)
