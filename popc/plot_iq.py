@@ -103,9 +103,19 @@ for variant in VARIANTS:
         label='experiment'
     )
     if variant == 'clean':
-        ax.axhline(y=1.0e-4, color='blue', linestyle='--', label='1.0e-4')
-        ax.axhline(y=1.0e-5, color='blue', linestyle='-.', label='1.0e-5')
-    ax.legend(loc='upper right')
+        ax.axhline(y=1.0e-4, color='blue', linestyle=':', label='I=1.0e-4')
+        ax.axhline(y=1.0e-5, color='blue', linestyle='-.', label='I=1.0e-5')
+        ax.axhline(y=5.0e-3, color='blue', linestyle='--', label='I=5.0e-3')
+        ax.axvline(x=0.40, color='green', linestyle='-', label='q=0.40')
+    if variant == 'direct':
+        ax.axhline(y=1.0e-3, color='blue', linestyle='-.', label='I=1.0e-3')
+        ax.axhline(y=5.0e-3, color='blue', linestyle='--', label='I=5.0e-3')
+        ax.axvline(x=0.20, color='green', linestyle='-', label='q=0.20')
+    if variant == 'half_clean':
+        ax.axhline(y=1.0e-4, color='blue', linestyle='-.', label='I=1.0e-4')
+        ax.axhline(y=5.0e-3, color='blue', linestyle='--', label='I=5.0e-3')
+        ax.axvline(x=0.25, color='green', linestyle='-', label='q=0.25')
+    ax.legend(loc='lower left')
     ax.set_xlim(0.05, 0.5)
     ax.set_ylim(1e-6, 1e-2)
     ax.set_xlabel('q [A$^{-1}$]')
